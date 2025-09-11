@@ -8,7 +8,8 @@ authors = [
 requires-python = ">=3.13"
 dependencies = [
     "fastapi (>=0.116.1,<0.117.0)",
-    "uvicorn (>=0.35.0,<0.36.0)"
+    "uvicorn (>=0.35.0,<0.36.0)",
+    "email-validator (>=2.3.0,<3.0.0)"
 ]
 
 
@@ -17,4 +18,4 @@ requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-    package-mode: false
+package-mode = false
