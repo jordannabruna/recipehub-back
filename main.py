@@ -1,14 +1,23 @@
 
 import uvicorn
 from fastapi import FastAPI
+
 from app.user import user_controller
 from app.recipe import recipe_controller
+from app.database import Base, engine
+import app.recipe.recipe_model  # Garante que o modelo seja importado
 
 #Cria a instância principal da nossa aplicação
+
 app = FastAPI(
     title="API do Meu Projeto",
     version="0.1.0"
 )
+
+# Cria as tabelas no banco de dados
+@app.on_event("startup")
+def on_startup():
+    Base.metadata.create_all(bind=engine)
 
 
 app.include_router(user_controller.router)
