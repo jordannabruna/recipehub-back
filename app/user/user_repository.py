@@ -1,7 +1,7 @@
 # users/user_repository.py
 from sqlalchemy.orm import Session
 from . import user_model
-from security import get_password_hash
+from app.security import get_password_hash
 
 # --- FUNÇÕES DE LEITURA (READ) ---
 def get_user(db: Session, user_id: int):
