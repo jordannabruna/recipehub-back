@@ -1,5 +1,5 @@
 # Dockerfile para Backend FastAPI
-FROM python:3.11-slim
+FROM python:3.13-slim
 
 # Define o diretório de trabalho
 WORKDIR /app
