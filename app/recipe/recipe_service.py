@@ -1,13 +1,13 @@
+# app/recipe/recipe_service.py
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from . import recipe_repository, recipe_model
 
-def create_new_recipe(db: Session, recipe: recipe_model.RecipeCreate):
-    # Regra de negócio: não permitir receitas com o mesmo título
+def create_new_recipe(db: Session, recipe: recipe_model.RecipeCreate, user_id: int):
     db_recipe = recipe_repository.get_recipe_by_title(db, title=recipe.title)
     if db_recipe:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Recipe with this title already exists")
-    return recipe_repository.create_recipe(db=db, recipe=recipe)
+    return recipe_repository.create_recipe(db=db, recipe=recipe, user_id=user_id)
 
 def get_all_recipes(db: Session):
     return recipe_repository.get_recipes(db)
