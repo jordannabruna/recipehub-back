@@ -43,6 +43,8 @@ def update_user(db: Session, db_user: user_model.User, user_in: user_model.UserU
 
 # --- FUNÇÃO DE DELEÇÃO (DELETE) ---
 def delete_user(db: Session, db_user: user_model.User):
+    _ = db_user.role 
+    
     db.delete(db_user)
     db.commit()
     return db_user

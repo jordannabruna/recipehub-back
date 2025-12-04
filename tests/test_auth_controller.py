@@ -1,6 +1,3 @@
-"""
-Testes Unitários para Autenticação do RecipeHub
-"""
 from fastapi.testclient import TestClient
 from main import app
 from app.database import Base, engine, SessionLocal
@@ -22,12 +19,12 @@ def setup_database():
 @pytest.fixture(scope="module")
 def client_with_user():
     """
-    Cria um usuário no banco para testarmos o login.
+    Cria um usuário no banco para testar o login
     """
     client = TestClient(app)
     db = SessionLocal()
 
-    # 1. Garante Role
+    # Garante Role
     role = db.query(Role).filter_by(name="user").first()
     if not role:
         role = Role(name="user")
@@ -35,7 +32,7 @@ def client_with_user():
         db.commit()
         db.refresh(role)
 
-    # 2. Garante Usuário
+    # Garante Usuário
     user = db.query(User).filter_by(email=LOGIN_EMAIL).first()
     if not user:
         user = User(

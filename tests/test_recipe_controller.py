@@ -1,3 +1,12 @@
+"""
+Testes Unitários - Controlador de Receitas
+
+Cobre o fluxo completo de Receitas:
+1. Setup de Banco e Autenticação.
+2. CRUD Completo (Create, Read, Update, Delete).
+3. Validações de erro (Campos obrigatórios, Títulos duplicados).
+4. Listagem de receitas.
+"""
 from fastapi.testclient import TestClient
 from main import app
 from app.database import Base, engine, SessionLocal
@@ -19,7 +28,6 @@ def setup_database():
     """
     Base.metadata.create_all(bind=engine)
     yield
-    # Opcional: Base.metadata.drop_all(bind=engine)
 
 @pytest.fixture(scope="module")
 def client_and_token():
@@ -40,7 +48,7 @@ def client_and_token():
         db.commit()
         db.refresh(role)
 
-    # 2. Garante que existe o Usuário
+    # Garante que existe o Usuário
     user = db.query(User).filter_by(email=LOGIN_EMAIL).first()
     if not user:
         user = User(
@@ -53,7 +61,6 @@ def client_and_token():
         db.commit()
     
     db.close()
-    # ----------------------------------
 
     # Realiza login via API
     login_response = client.post("/auth/login", data={
@@ -76,7 +83,7 @@ def test_recipe_crud_sequence(client_and_token):
     random_suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
     recipe_title = f"Bolo de Teste {random_suffix}"
 
-    # 1. CREATE
+    # CREATE
     recipe_data = {
         "title": recipe_title,
         "description": "Descrição original",
@@ -87,18 +94,18 @@ def test_recipe_crud_sequence(client_and_token):
     recipe_id = create_resp.json()["id"]
     assert create_resp.json()["owner_id"] is not None
 
-    # 2. READ
+    # READ (Por ID)
     get_resp = client.get(f"/recipes/{recipe_id}", headers=headers)
     assert get_resp.status_code == 200
     assert get_resp.json()["title"] == recipe_title
 
-    # 3. UPDATE
+    # UPDATE
     update_data = {"description": "Descrição Editada"}
     update_resp = client.put(f"/recipes/{recipe_id}", json=update_data, headers=headers)
     assert update_resp.status_code == 200
     assert update_resp.json()["description"] == "Descrição Editada"
 
-    # 4. DELETE
+    # DELETE
     delete_resp = client.delete(f"/recipes/{recipe_id}", headers=headers)
     assert delete_resp.status_code == 200
 
@@ -113,11 +120,11 @@ def test_create_recipe_validations(client_and_token):
     client, token = client_and_token
     headers = {"Authorization": f"Bearer {token}"}
 
-    # Teste 1: Sem Título (Erro 422)
+    # Teste 1: Sem Título
     resp_missing = client.post("/recipes/", json={"description": "Sem título"}, headers=headers)
     assert resp_missing.status_code == 422
 
-    # Teste 2: Título Duplicado (Erro 400)
+    # Teste 2: Título Duplicado
     unique_title = f"Receita Duplicada {random.randint(1, 9999)}"
     # Cria a primeira
     client.post("/recipes/", json={"title": unique_title}, headers=headers)
@@ -125,3 +132,19 @@ def test_create_recipe_validations(client_and_token):
     resp_dup = client.post("/recipes/", json={"title": unique_title}, headers=headers)
     assert resp_dup.status_code == 400
     assert "already exists" in resp_dup.json()["detail"]
+
+def test_read_all_recipes(client_and_token):
+    """
+    Testa a listagem de todas as receitas.
+    """
+    client, token = client_and_token
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    # Cria pelo menos uma receita para garantir que a lista não venha vazia
+    client.post("/recipes/", json={"title": f"Receita da Lista {random.randint(1,9999)}"}, headers=headers)
+
+    response = client.get("/recipes/", headers=headers)
+    assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data, list)
+    assert len(data) > 0
