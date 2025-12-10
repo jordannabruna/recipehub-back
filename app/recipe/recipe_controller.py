@@ -1,51 +1,100 @@
 # app/recipe/recipe_controller.py
+
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends, status
 from typing import List
 
 from app.database import get_db
 from . import recipe_service, recipe_model
 
-# Imports de Segurança (observe o "users" no plural agora)
+# Segurança
 from app.auth.auth_service import get_current_user
-from app.users.user_model import User 
+from app.users.user_model import User
+
 
 router = APIRouter(prefix="/recipes", tags=["Recipes"])
 
-@router.post("/", response_model=recipe_model.RecipePublic, status_code=status.HTTP_201_CREATED)
+
+# ================================
+# FORMATADOR PARA O FRONT-END
+# ================================
+def recipe_to_public(recipe: recipe_model.Recipe):
+    return {
+        "id": recipe.id,
+        "title": recipe.title,
+        "description": recipe.description or "",
+        "category": getattr(recipe, "category", "General") or "General",
+        "time_minutes": getattr(recipe, "time_minutes", 0) or 0,
+        "image_url": getattr(recipe, "image_url", "") or "",
+    }
+
+
+# ================================
+# CRIAR RECEITA
+# ================================
+@router.post("/", status_code=status.HTTP_201_CREATED)
 def create_recipe(
-    recipe: recipe_model.RecipeCreate, 
+    recipe: recipe_model.RecipeCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user) # Exige login
+    current_user: User = Depends(get_current_user)
 ):
-    """Cria nova receita vinculada ao usuário logado."""
-    return recipe_service.create_new_recipe(db=db, recipe=recipe, user_id=current_user.id)
+    new_recipe = recipe_service.create_new_recipe(
+        db=db,
+        recipe=recipe,
+        user_id=current_user.id
+    )
+    return recipe_to_public(new_recipe)
 
-@router.get("/", response_model=List[recipe_model.RecipePublic])
+
+# ================================
+# LISTAR TODAS AS RECEITAS (PÚBLICO)
+# ================================
+@router.get("/")
 def read_recipes(db: Session = Depends(get_db)):
-    """Lista todas as receitas (Público)."""
-    return recipe_service.get_all_recipes(db)
+    recipes = recipe_service.get_all_recipes(db)
+    return [recipe_to_public(r) for r in recipes]
 
-@router.get("/{recipe_id}", response_model=recipe_model.RecipePublic)
+
+# ================================
+# BUSCAR POR ID
+# ================================
+@router.get("/{recipe_id}")
 def read_recipe(recipe_id: int, db: Session = Depends(get_db)):
-    """Busca receita por ID (Público)."""
-    return recipe_service.get_recipe_by_id(db, recipe_id=recipe_id)
+    recipe = recipe_service.get_recipe_by_id(db, recipe_id)
 
-@router.put("/{recipe_id}", response_model=recipe_model.RecipePublic)
+    if not recipe:
+        raise HTTPException(status_code=404, detail="Recipe not found")
+
+    return recipe_to_public(recipe)
+
+
+# ================================
+# ATUALIZAR RECEITA (LOGIN OBRIGATÓRIO)
+# ================================
+@router.put("/{recipe_id}")
 def update_recipe(
-    recipe_id: int, 
-    recipe: recipe_model.RecipeUpdate, 
+    recipe_id: int,
+    recipe: recipe_model.RecipeUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user) # Exige login
+    current_user: User = Depends(get_current_user)
 ):
-    """Atualiza receita (Requer Login)."""
-    return recipe_service.update_existing_recipe(db=db, recipe_id=recipe_id, recipe_in=recipe)
+    updated = recipe_service.update_existing_recipe(
+        db=db,
+        recipe_id=recipe_id,
+        recipe_in=recipe
+    )
 
-@router.delete("/{recipe_id}", response_model=recipe_model.RecipePublic)
+    return recipe_to_public(updated)
+
+
+# ================================
+# DELETAR RECEITA (LOGIN OBRIGATÓRIO)
+# ================================
+@router.delete("/{recipe_id}")
 def delete_recipe(
-    recipe_id: int, 
+    recipe_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user) # Exige login
+    current_user: User = Depends(get_current_user)
 ):
-    """Deleta receita (Requer Login)."""
-    return recipe_service.delete_recipe_by_id(db=db, recipe_id=recipe_id)
+    deleted = recipe_service.delete_recipe_by_id(db=db, recipe_id=recipe_id)
+    return recipe_to_public(deleted)
