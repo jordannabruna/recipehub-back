@@ -1,13 +1,10 @@
-# user/user_model.py
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from app.database import Base
-from app.roles.role_model import RolePublic # Importa o schema público de Role
+from app.roles.role_model import RolePublic
 
-# ==================================
-# MODELO DA TABELA (SQLAlchemy)
-# ==================================
+
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
@@ -15,15 +12,10 @@ class User(Base):
     hashed_password = Column(String)
     full_name = Column(String, index=True, nullable=True)
     profile_image_url = Column(String, nullable=True)
-    # Chave estrangeira que aponta para a tabela 'roles'
     role_id = Column(Integer, ForeignKey("roles.id"))
-    # Cria a relação para que possamos acessar o objeto Role a partir de um User
     role = relationship("Role")
-    # Relação com Recipe (forward reference, definida após a classe)
 
-# ==================================
-# SCHEMAS (Pydantic)
-# ==================================
+
 class UserCreate(BaseModel):
     email: EmailStr
     password: str = Field(min_length=8)
@@ -42,7 +34,7 @@ class UserPublic(BaseModel):
     email: EmailStr
     full_name: str | None = None
     profile_image_url: str | None = None
-    role: RolePublic # O perfil agora é um objeto aninhado
+    role: RolePublic
 
 class UserLoginResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -52,4 +44,4 @@ class UserLoginResponse(BaseModel):
     full_name: str | None = None
     profile_image_url: str | None = None
     role: RolePublic
-    token: str # JWT Token
+    token: str

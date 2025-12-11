@@ -7,7 +7,6 @@ def create_new_user(db: Session, user: user_model.UserCreate):
     if db_user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
 
-    # A lógica de buscar o role foi removida, pois o ID agora vem do controller
     return user_repository.create_user(db=db, user=user, role_id=user.role_id)
 
 def authenticate_user(db: Session, email: str, password: str):
@@ -21,10 +20,8 @@ def authenticate_user(db: Session, email: str, password: str):
             detail="Email ou senha inválidos"
         )
     
-    # Gerar JWT token
     token = create_access_token(data={"sub": user.email, "role": user.role.name})
     
-    # Retornar user com token
     return {
         "id": user.id,
         "email": user.email,

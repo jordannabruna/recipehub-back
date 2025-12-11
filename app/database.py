@@ -17,7 +17,6 @@ else:
     DB_PORT = os.getenv('POSTGRES_PORT', '5432')
     DB_NAME = os.getenv('POSTGRES_DB', 'recipe_hub')
 
-    # Garantir que DB_PORT é uma string válida
     if not DB_PORT or DB_PORT.strip() == '':
         DB_PORT = '5432'
 

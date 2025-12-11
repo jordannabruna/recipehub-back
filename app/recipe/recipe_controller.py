@@ -1,13 +1,9 @@
-# app/recipe/recipe_controller.py
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 
 from app.database import get_db
 from . import recipe_service, recipe_model
-
-# Segurança
 from app.auth.auth_service import get_current_user
 from app.users.user_model import User
 
@@ -15,9 +11,6 @@ from app.users.user_model import User
 router = APIRouter(prefix="/recipes", tags=["Recipes"])
 
 
-# ================================
-# FORMATADOR PARA O FRONT-END
-# ================================
 def recipe_to_public(recipe: recipe_model.Recipe):
     return {
         "id": recipe.id,
@@ -29,9 +22,6 @@ def recipe_to_public(recipe: recipe_model.Recipe):
     }
 
 
-# ================================
-# CRIAR RECEITA
-# ================================
 @router.post("/", status_code=status.HTTP_201_CREATED)
 def create_recipe(
     recipe: recipe_model.RecipeCreate,
@@ -46,18 +36,12 @@ def create_recipe(
     return recipe_to_public(new_recipe)
 
 
-# ================================
-# LISTAR TODAS AS RECEITAS (PÚBLICO)
-# ================================
 @router.get("/")
 def read_recipes(db: Session = Depends(get_db)):
     recipes = recipe_service.get_all_recipes(db)
     return [recipe_to_public(r) for r in recipes]
 
 
-# ================================
-# BUSCAR POR ID
-# ================================
 @router.get("/{recipe_id}")
 def read_recipe(recipe_id: int, db: Session = Depends(get_db)):
     recipe = recipe_service.get_recipe_by_id(db, recipe_id)
@@ -68,9 +52,6 @@ def read_recipe(recipe_id: int, db: Session = Depends(get_db)):
     return recipe_to_public(recipe)
 
 
-# ================================
-# ATUALIZAR RECEITA (LOGIN OBRIGATÓRIO)
-# ================================
 @router.put("/{recipe_id}")
 def update_recipe(
     recipe_id: int,
@@ -87,9 +68,6 @@ def update_recipe(
     return recipe_to_public(updated)
 
 
-# ================================
-# DELETAR RECEITA (LOGIN OBRIGATÓRIO)
-# ================================
 @router.delete("/{recipe_id}")
 def delete_recipe(
     recipe_id: int,

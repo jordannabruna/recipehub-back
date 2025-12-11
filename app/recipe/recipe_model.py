@@ -27,9 +27,6 @@ class Recipe(Base):
 
     owner_id = Column(Integer, ForeignKey("users.id"))
 
-    # Relação com User (será definida quando User tiver a relação recipes)
-    # owner = relationship("User", back_populates="recipes")
-
 
 class RecipeBase(BaseModel):
     title: str = Field(..., min_length=3)

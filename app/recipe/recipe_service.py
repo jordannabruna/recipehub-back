@@ -4,7 +4,6 @@ from . import recipe_repository, recipe_model
 
 
 def create_new_recipe(db: Session, recipe: recipe_model.RecipeCreate, user_id: int):
-    # Evita duplicação pelo título
     db_recipe = recipe_repository.get_recipe_by_title(db, title=recipe.title)
     if db_recipe:
         raise HTTPException(
@@ -12,7 +11,6 @@ def create_new_recipe(db: Session, recipe: recipe_model.RecipeCreate, user_id: i
             detail="Recipe with this title already exists"
         )
     
-    # Cria receita normalmente
     return recipe_repository.create_recipe(
         db=db,
         recipe=recipe,

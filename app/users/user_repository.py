@@ -1,9 +1,8 @@
-# users/user_repository.py
 from sqlalchemy.orm import Session
 from . import user_model
 from app.security import get_password_hash
 
-# --- FUNÇÕES DE LEITURA (READ) ---
+
 def get_user(db: Session, user_id: int):
     return db.query(user_model.User).filter(user_model.User.id == user_id).first()
 
@@ -13,7 +12,7 @@ def get_user_by_email(db: Session, email: str):
 def get_users(db: Session):
     return db.query(user_model.User).all()
 
-# --- FUNÇÃO DE CRIAÇÃO (CREATE) ---
+
 def create_user(db: Session, user: user_model.UserCreate, role_id: int):
     hashed_password = get_password_hash(user.password)
     db_user = user_model.User(
@@ -28,7 +27,7 @@ def create_user(db: Session, user: user_model.UserCreate, role_id: int):
     db.refresh(db_user)
     return db_user
 
-# --- FUNÇÃO DE ATUALIZAÇÃO (UPDATE) ---
+
 def update_user(db: Session, db_user: user_model.User, user_in: user_model.UserUpdate):
     update_data = user_in.model_dump(exclude_unset=True)
     for key, value in update_data.items():
@@ -41,10 +40,10 @@ def update_user(db: Session, db_user: user_model.User, user_in: user_model.UserU
     db.refresh(db_user)
     return db_user
 
-# --- FUNÇÃO DE DELEÇÃO (DELETE) ---
+
 def delete_user(db: Session, db_user: user_model.User):
-    _ = db_user.role 
-    
+    role = db_user.role
     db.delete(db_user)
     db.commit()
+    db_user.role = role
     return db_user
