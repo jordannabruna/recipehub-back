@@ -44,7 +44,6 @@ app = FastAPI(
 
 if APP_PROFILE == "DEV":
     # Em DEV, listamos as portas comuns usadas localmente pelo Flutter Web e React
-    # Nota: Usar "*" com allow_credentials=True geralmente causa erro nos navegadores.
     origins = [
         "http://localhost",
         "http://localhost:8080",    # Flutter Web default
@@ -52,28 +51,23 @@ if APP_PROFILE == "DEV":
         "http://localhost:3000",    # React/Next default
         "http://127.0.0.1:3000",
     ]
-    
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=origins,
-        allow_credentials=True, # Importante para enviar Cookies/Headers de Auth
-        allow_methods=["*"],    # Libera GET, POST, PUT, DELETE, PATCH, OPTIONS
-        allow_headers=["*"],    # Libera todos os headers
-    )
 else:
-    # Em PROD (Render), aceita apenas o seu domínio frontend
-    origins_prod = [
+    # Em PROD (Render), aceita domínios do Render
+    origins = [
         "https://recipehub-front-nm-1.onrender.com",
-        "https://recipehub-front-nm-1.onrender.com/", 
+        "https://recipehub-frontend.onrender.com",
+        "https://recipehub-app.onrender.com",
+        # Adicione aqui o domínio exato do seu frontend
+        # Exemplo: "https://seu-frontend-xxx.onrender.com"
     ]
-    
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=origins_prod,
-        allow_credentials=True,
-        allow_methods=["*"], 
-        allow_headers=["*"],
-    )
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True, # Importante para enviar Cookies/Headers de Auth
+    allow_methods=["*"],    # Libera GET, POST, PUT, DELETE, PATCH, OPTIONS
+    allow_headers=["*"],    # Libera todos os headers
+)
 
 # --- ROTAS ---
 app.include_router(user_controller.router)
