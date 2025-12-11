@@ -17,11 +17,11 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copia o arquivo de dependências
-COPY pyproject.toml ./
+COPY requirements.txt ./
 
 # Instala dependências usando pip
 RUN pip install --upgrade pip && \
-    pip install fastapi uvicorn sqlalchemy email-validator python-multipart passlib[bcrypt] python-jose bcrypt psycopg2-binary
+    pip install -r requirements.txt
 
 # Copia o restante do código da aplicação
 COPY . .
