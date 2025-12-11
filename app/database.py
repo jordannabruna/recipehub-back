@@ -17,6 +17,10 @@ else:
     DB_PORT = os.getenv('POSTGRES_PORT', '5432')
     DB_NAME = os.getenv('POSTGRES_DB', 'recipe_hub')
 
+    # Garantir que DB_PORT é uma string válida
+    if not DB_PORT or DB_PORT.strip() == '':
+        DB_PORT = '5432'
+
     SQLALCHEMY_DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 engine = create_engine(
