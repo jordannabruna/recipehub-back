@@ -13,9 +13,26 @@ from app.recipe import recipe_controller
 # Lê a variável de ambiente, padrão é "DEV" se não existir
 APP_PROFILE = os.getenv("APP_PROFILE", "DEV")
 
-# Cria as tabelas automaticamente apenas em ambiente de desenvolvimento
-if APP_PROFILE == "DEV":
-    Base.metadata.create_all(bind=engine)
+# Cria as tabelas automaticamente em DEV e PROD
+Base.metadata.create_all(bind=engine)
+
+# Inicializa as roles padrão
+from app.database import SessionLocal
+from app.roles.role_model import Role
+
+db = SessionLocal()
+try:
+    if not db.query(Role).filter_by(name="admin").first():
+        admin_role = Role(id=1, name="admin")
+        db.add(admin_role)
+        db.commit()
+    
+    if not db.query(Role).filter_by(name="user").first():
+        user_role = Role(id=2, name="user")
+        db.add(user_role)
+        db.commit()
+finally:
+    db.close()
 
 app = FastAPI(
     title="API do RecipeHub",
