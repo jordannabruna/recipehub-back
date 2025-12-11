@@ -36,17 +36,10 @@ def get_recipe_by_id(db: Session, recipe_id: int):
 
 def update_existing_recipe(db: Session, recipe_id: int, recipe_in: recipe_model.RecipeUpdate):
     db_recipe = get_recipe_by_id(db, recipe_id)
-
-    safe_data = recipe_in.model_dump(exclude_unset=True)
-
-    safe_data.pop("category", None)
-    safe_data.pop("time_minutes", None)
-    safe_data.pop("image_url", None)
-
     return recipe_repository.update_recipe(
         db=db,
         db_recipe=db_recipe,
-        recipe_in=safe_data  
+        recipe_in=recipe_in
     )
 
 

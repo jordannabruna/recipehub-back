@@ -42,12 +42,9 @@ def update_recipe(db: Session, db_recipe: recipe_model.Recipe, recipe_in):
     else:
         update_data = dict(recipe_in)
 
-    update_data.pop("category", None)
-    update_data.pop("time_minutes", None)
-    update_data.pop("image_url", None)
-
     for key, value in update_data.items():
-        setattr(db_recipe, key, value)
+        if value is not None:
+            setattr(db_recipe, key, value)
 
     db.add(db_recipe)
     db.commit()
