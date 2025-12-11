@@ -19,7 +19,7 @@ def create_user(db: Session, user: user_model.UserCreate, role_id: int):
     db_user = user_model.User(
         email=user.email, 
         hashed_password=hashed_password, 
-        full_name=user.full_name,
+        full_name=user.name,
         profile_image_url=user.profile_image_url,
         role_id=role_id
     )

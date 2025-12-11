@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  # Banco de dados PostgreSQL
+  db:
+    image: postgres:15-alpine
+    container_name: recipehub-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgresql}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-12345678}
+      POSTGRES_DB: ${POSTGRES_DB:-recipe_hub}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgresql}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - recipehub-network
+
+  # Backend FastAPI
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: recipehub-backend
+    environment:
+      APP_PROFILE: PROD
+      POSTGRES_USER: ${POSTGRES_USER:-postgresql}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-12345678}
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-recipe_hub}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    command: bash -c "python init_db.py && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    networks:
+      - recipehub-network
+
+volumes:
+  postgres_data:
+
+networks:
+  recipehub-network:
+    driver: bridge

@@ -20,17 +20,24 @@ class Recipe(Base):
     title = Column(String(255), unique=True, nullable=False)
     description = Column(Text, nullable=True)
     instructions = Column(Text, nullable=False)
+    category = Column(String(100), nullable=False)
+    time_minutes = Column(Integer, nullable=True)
+    image_url = Column(String, nullable=True)
     meal_type = Column(Enum(MealType), nullable=False)
 
     owner_id = Column(Integer, ForeignKey("users.id"))
 
-    owner = relationship("User", back_populates="recipes")
+    # Relação com User (será definida quando User tiver a relação recipes)
+    # owner = relationship("User", back_populates="recipes")
 
 
 class RecipeBase(BaseModel):
     title: str = Field(..., min_length=3)
     description: str | None = None
     instructions: str
+    category: str
+    time_minutes: int | None = None
+    image_url: str | None = None
     meal_type: MealType
 
 
@@ -42,6 +49,9 @@ class RecipeUpdate(BaseModel):
     title: str | None = Field(None, min_length=3)
     description: str | None = None
     instructions: str | None = None
+    category: str | None = None
+    time_minutes: int | None = None
+    image_url: str | None = None
     meal_type: MealType | None = None
 
 

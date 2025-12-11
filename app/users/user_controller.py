@@ -12,6 +12,11 @@ def create_user(user: user_model.UserCreate, db: Session = Depends(get_db)):
     """Endpoint para criar um novo usuário."""
     return user_service.create_new_user(db=db, user=user)
 
+@router.post("/login", response_model=user_model.UserPublic)
+def login(email: str, password: str, db: Session = Depends(get_db)):
+    """Endpoint para login do usuário."""
+    return user_service.authenticate_user(db=db, email=email, password=password)
+
 @router.get("/", response_model=List[user_model.UserPublic])
 def read_users(db: Session = Depends(get_db)):
     """Endpoint para listar todos os usuários."""

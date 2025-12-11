@@ -19,6 +19,7 @@ class User(Base):
     role_id = Column(Integer, ForeignKey("roles.id"))
     # Cria a relação para que possamos acessar o objeto Role a partir de um User
     role = relationship("Role")
+    # Relação com Recipe (forward reference, definida após a classe)
 
 # ==================================
 # SCHEMAS (Pydantic)
@@ -26,9 +27,9 @@ class User(Base):
 class UserCreate(BaseModel):
     email: EmailStr
     password: str = Field(min_length=8)
-    full_name: str | None = Field(default=None, min_length=3)
+    name: str = Field(min_length=3)
     profile_image_url: str | None = None
-    role_id: int = Field(description="ID do role a ser associado ao usuário")
+    role_id: int | None = Field(default=1, description="ID do role a ser associado ao usuário")
 
 class UserUpdate(BaseModel):
     full_name: str | None = Field(default=None, min_length=3)

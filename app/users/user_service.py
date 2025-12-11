@@ -10,6 +10,18 @@ def create_new_user(db: Session, user: user_model.UserCreate):
     # A lógica de buscar o role foi removida, pois o ID agora vem do controller
     return user_repository.create_user(db=db, user=user, role_id=user.role_id)
 
+def authenticate_user(db: Session, email: str, password: str):
+    """Autentica um usuário e retorna os dados se válido."""
+    from app.security import verify_password
+    
+    user = user_repository.get_user_by_email(db, email=email)
+    if not user or not verify_password(password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Email ou senha inválidos"
+        )
+    return user
+
 def get_all_users(db: Session):
     return user_repository.get_users(db)
 
