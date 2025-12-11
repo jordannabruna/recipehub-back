@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from pydantic import BaseModel, EmailStr, Field, ConfigDict
+from typing import Annotated
 from app.database import Base
 from app.roles.role_model import RolePublic
 
@@ -19,9 +20,11 @@ class User(Base):
 class UserCreate(BaseModel):
     email: EmailStr
     password: str = Field(min_length=8)
-    name: str = Field(min_length=3)
+    name: Annotated[str, Field(min_length=3)]
     profile_image_url: str | None = None
     role_id: int | None = Field(default=1, description="ID do role a ser associado ao usuário")
+    
+    model_config = ConfigDict(populate_by_name=True)
 
 class UserUpdate(BaseModel):
     full_name: str | None = Field(default=None, min_length=3)
