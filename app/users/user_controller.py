@@ -12,9 +12,9 @@ def create_user(user: user_model.UserCreate, db: Session = Depends(get_db)):
     """Endpoint para criar um novo usuário."""
     return user_service.create_new_user(db=db, user=user)
 
-@router.post("/login", response_model=user_model.UserPublic)
+@router.post("/login", response_model=user_model.UserLoginResponse)
 def login(email: str, password: str, db: Session = Depends(get_db)):
-    """Endpoint para login do usuário."""
+    """Endpoint para login do usuário e obtenção de JWT token."""
     return user_service.authenticate_user(db=db, email=email, password=password)
 
 @router.get("/", response_model=List[user_model.UserPublic])

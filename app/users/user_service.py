@@ -11,8 +11,8 @@ def create_new_user(db: Session, user: user_model.UserCreate):
     return user_repository.create_user(db=db, user=user, role_id=user.role_id)
 
 def authenticate_user(db: Session, email: str, password: str):
-    """Autentica um usuário e retorna os dados se válido."""
-    from app.security import verify_password
+    """Autentica um usuário e retorna os dados com token JWT."""
+    from app.security import verify_password, create_access_token
     
     user = user_repository.get_user_by_email(db, email=email)
     if not user or not verify_password(password, user.hashed_password):
@@ -20,7 +20,19 @@ def authenticate_user(db: Session, email: str, password: str):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email ou senha inválidos"
         )
-    return user
+    
+    # Gerar JWT token
+    token = create_access_token(data={"sub": user.email, "role": user.role.name})
+    
+    # Retornar user com token
+    return {
+        "id": user.id,
+        "email": user.email,
+        "full_name": user.full_name,
+        "profile_image_url": user.profile_image_url,
+        "role": user.role,
+        "token": token
+    }
 
 def get_all_users(db: Session):
     return user_repository.get_users(db)

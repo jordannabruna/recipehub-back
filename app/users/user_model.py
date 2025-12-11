@@ -43,3 +43,13 @@ class UserPublic(BaseModel):
     full_name: str | None = None
     profile_image_url: str | None = None
     role: RolePublic # O perfil agora é um objeto aninhado
+
+class UserLoginResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    email: EmailStr
+    full_name: str | None = None
+    profile_image_url: str | None = None
+    role: RolePublic
+    token: str # JWT Token
