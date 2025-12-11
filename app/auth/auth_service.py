@@ -10,7 +10,7 @@ from app.users import user_repository
 from app.security import verify_password, SECRET_KEY, ALGORITHM, TokenData
 from app.users.user_model import User
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login", auto_error=True)
 
 def authenticate_user(db: Session, email: str, password: str):
     user = user_repository.get_user_by_email(db, email=email)
