@@ -40,32 +40,14 @@ app = FastAPI(
 )
 
 # --- CONFIGURAÇÃO DO CORS ---
-# Definimos as origens permitidas baseadas no ambiente
-
-if APP_PROFILE == "DEV":
-    # Em DEV, listamos as portas comuns usadas localmente pelo Flutter Web e React
-    origins = [
-        "http://localhost",
-        "http://localhost:8080",    # Flutter Web default
-        "http://127.0.0.1:8080",    # Flutter Web IP
-        "http://localhost:3000",    # React/Next default
-        "http://127.0.0.1:3000",
-    ]
-else:
-    # Em PROD (Render), aceita domínios do Render
-    origins = [
-        "https://recipehub-frontend-ov5q.onrender.com",
-        "https://recipehub-front-nm-1.onrender.com",
-        "https://recipehub-frontend.onrender.com",
-        "https://recipehub-app.onrender.com",
-    ]
+# Aceita qualquer origem para desenvolvimento e testes
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True, # Importante para enviar Cookies/Headers de Auth
-    allow_methods=["*"],    # Libera GET, POST, PUT, DELETE, PATCH, OPTIONS
-    allow_headers=["*"],    # Libera todos os headers
+    allow_origins=["*"],           # Permite qualquer origem
+    allow_credentials=True,        # Importante para enviar Cookies/Headers de Auth
+    allow_methods=["*"],           # Libera GET, POST, PUT, DELETE, PATCH, OPTIONS
+    allow_headers=["*"],           # Libera todos os headers
 )
 
 # --- ROTAS ---
