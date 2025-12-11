@@ -77,3 +77,18 @@ def delete_recipe(
 ):
     deleted = recipe_service.delete_recipe_by_id(db=db, recipe_id=recipe_id)
     return recipe_to_public(deleted)
+
+
+@router.get("/me/my-recipes")
+def read_my_recipes(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    recipes = recipe_service.get_user_recipes(db, current_user.id)
+    return [recipe_to_public(r) for r in recipes]
+
+
+@router.get("/user/{user_id}")
+def read_user_recipes(user_id: int, db: Session = Depends(get_db)):
+    recipes = recipe_service.get_recipes_by_owner(db, user_id)
+    return [recipe_to_public(r) for r in recipes]

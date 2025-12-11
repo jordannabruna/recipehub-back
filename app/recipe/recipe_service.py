@@ -46,3 +46,11 @@ def update_existing_recipe(db: Session, recipe_id: int, recipe_in: recipe_model.
 def delete_recipe_by_id(db: Session, recipe_id: int):
     db_recipe = get_recipe_by_id(db, recipe_id)
     return recipe_repository.delete_recipe(db=db, db_recipe=db_recipe)
+
+
+def get_recipes_by_owner(db: Session, owner_id: int):
+    return recipe_repository.get_recipes_by_owner(db, owner_id)
+
+
+def get_user_recipes(db: Session, user_id: int):
+    return recipe_repository.get_recipes_by_owner(db, user_id)

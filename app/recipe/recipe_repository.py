@@ -56,3 +56,11 @@ def delete_recipe(db: Session, db_recipe: recipe_model.Recipe):
     db.delete(db_recipe)
     db.commit()
     return db_recipe
+
+
+def get_recipes_by_owner(db: Session, owner_id: int):
+    return (
+        db.query(recipe_model.Recipe)
+        .filter(recipe_model.Recipe.owner_id == owner_id)
+        .all()
+    )
