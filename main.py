@@ -54,11 +54,10 @@ if APP_PROFILE == "DEV":
 else:
     # Em PROD (Render), aceita domínios do Render
     origins = [
+        "https://recipehub-frontend-ov5q.onrender.com",
         "https://recipehub-front-nm-1.onrender.com",
         "https://recipehub-frontend.onrender.com",
         "https://recipehub-app.onrender.com",
-        # Adicione aqui o domínio exato do seu frontend
-        # Exemplo: "https://seu-frontend-xxx.onrender.com"
     ]
 
 app.add_middleware(
