@@ -12,6 +12,14 @@ router = APIRouter(prefix="/recipes", tags=["Recipes"])
 
 
 def recipe_to_public(recipe: recipe_model.Recipe):
+    owner_data = None
+    if recipe.owner:
+        owner_data = {
+            "id": recipe.owner.id,
+            "name": recipe.owner.full_name,
+            "profile_image_url": recipe.owner.profile_image_url,
+        }
+    
     return {
         "id": recipe.id,
         "title": recipe.title,
@@ -20,6 +28,9 @@ def recipe_to_public(recipe: recipe_model.Recipe):
         "category": getattr(recipe, "category", "General") or "General",
         "time_minutes": getattr(recipe, "time_minutes", 0) or 0,
         "image_url": getattr(recipe, "image_url", "") or "",
+        "owner_id": recipe.owner_id,
+        "owner": owner_data,
+        "meal_type": getattr(recipe, "meal_type", "lunch") or "lunch",
     }
 
 

@@ -26,6 +26,7 @@ class Recipe(Base):
     meal_type = Column(Enum(MealType), nullable=False)
 
     owner_id = Column(Integer, ForeignKey("users.id"))
+    owner = relationship("User", foreign_keys=[owner_id])
 
 
 class RecipeBase(BaseModel):
