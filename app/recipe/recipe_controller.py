@@ -16,6 +16,7 @@ def recipe_to_public(recipe: recipe_model.Recipe):
         "id": recipe.id,
         "title": recipe.title,
         "description": recipe.description or "",
+        "instructions": recipe.instructions or "",
         "category": getattr(recipe, "category", "General") or "General",
         "time_minutes": getattr(recipe, "time_minutes", 0) or 0,
         "image_url": getattr(recipe, "image_url", "") or "",
